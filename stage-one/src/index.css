@@ -1,0 +1,182 @@
+html {
+  box-sizing: border-box;
+  font-size: 10px;
+  background: #ffc600;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Amatic SC", cursive;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  min-height: 100vh;
+}
+
+h1 {
+  text-align: center;
+  font-size: 6rem;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+h2 {
+  font-size: 2rem;
+  text-align: center;
+  transition: all 0.3s ease-in-out;
+  text-transform: capitalize;
+}
+
+p {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-block: 10px;
+}
+
+.colorBoxWrapper {
+  padding: 0 3rem;
+  display: grid;
+  place-content: center;
+  grid-template-rows: 1fr;
+  grid-template-columns: 1fr;
+  div {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+    border-radius: 8px;
+    height: 100px;
+    width: 100px;
+    padding: 25px;
+    border: none;
+    background-color: black;
+    transition: all 0.3s;
+  }
+}
+
+.colorOptionWrapper {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.colorBtnOption {
+  height: 50px;
+  width: 50px;
+  padding: 10px;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  outline-offset: 4px;
+  outline: none;
+  &:disabled {
+    cursor: not-allowed;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+
+    outline: 1.5px solid black;
+  }
+
+  &.selected {
+    outline: 1.5px solid black;
+  }
+}
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.questionMark {
+  font-size: 4rem;
+  color: white;
+  text-align: center;
+}
+
+.fadeOut {
+  animation: fadeOut 0.4s forwards ease-out;
+}
+
+.scoreWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 60px;
+  width: 100%;
+}
+
+.scoreStatus,
+.highScore {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 15px;
+  font-size: 2rem;
+}
+
+.startBtn {
+  width: 80px;
+  height: 40px;
+  text-align: center;
+  font-size: 2rem;
+  display: flex;
+  font-weight: 600;
+  justify-content: center;
+  align-items: center;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  h1 {
+    font-size: 4rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+  }
+  p {
+    font-size: 1.5rem;
+  }
+  .colorBoxWrapper {
+    padding: 0 1rem;
+  }
+  .colorOptionWrapper {
+    gap: 1rem;
+  }
+  .colorBtnOption {
+    height: 40px;
+    width: 40px;
+    padding: 5px;
+  }
+  .scoreWrapper {
+    gap: 20px;
+  }
+  .scoreStatus,
+  .highScore {
+    padding: 10px;
+    font-size: 1.5rem;
+  }
+  .startBtn {
+    width: 60px;
+    height: 30px;
+    font-size: 1.5rem;
+  }
+}
