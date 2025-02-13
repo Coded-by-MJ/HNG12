@@ -111,7 +111,7 @@ function AttendeeDetailsCard() {
     updateUser("request", request);
     addTicketToStore();
     updateStepsData({
-      title: "Ticket Ready",
+      title: "Ready",
       currentStep: 2,
       percent: 100,
     });
