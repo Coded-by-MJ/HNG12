@@ -241,6 +241,9 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       if (userInput.text.length >= 150) {
         await verifyTextForSummary();
       } else {
+        if (appMode === "Summary") {
+          setAppMode("Detection");
+        }
         setShowSummarizeButton(false);
       }
     };
