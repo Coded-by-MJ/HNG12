@@ -184,9 +184,9 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
           console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
         });
 
-        console.log("Waiting for summarizer model to be ready...");
+        // console.log("Waiting for summarizer model to be ready...");
         await summarizer.ready;
-        console.log("Summarizer model is ready!");
+        // console.log("Summarizer model is ready!");
       }
 
       const summary = await summarizer.summarize(userInput.text);
