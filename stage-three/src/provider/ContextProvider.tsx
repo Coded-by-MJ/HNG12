@@ -169,21 +169,33 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   const handleSummary = async () => {
     setIsLoading(true);
-    const ai = await (self as any).ai;
+    const ai = (self as any).ai;
     const { available } = await ai.summarizer.capabilities();
-
+    let summarizer;
+    if (available === "no") {
+      toast.error("Summarize API is not supported in your browser.");
+      return;
+    }
     try {
-      if (ai && available === "readily") {
-        const summarizer = await ai.summarizer.create(summaryOptions);
-        const summary = await summarizer.summarize(userInput.text);
-        addToChats({
-          from: "Chucky",
-          subject: `Text Summary:`,
-          text: summary,
+      summarizer = await ai.summarizer.create(summaryOptions);
+
+      if (available === "after-download") {
+        summarizer.addEventListener("downloadprogress", (e: any) => {
+          console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
         });
-      } else {
-        toast.error("Summarize API is not supported in your browser.");
+
+        console.log("Waiting for summarizer model to be ready...");
+        await summarizer.ready;
+        console.log("Summarizer model is ready!");
       }
+
+      const summary = await summarizer.summarize(userInput.text);
+
+      addToChats({
+        from: "Chucky",
+        subject: `Text Summary:`,
+        text: summary,
+      });
     } catch (error) {
       console.error(`ERROR: ${error}`);
     } finally {
