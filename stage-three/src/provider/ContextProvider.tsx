@@ -65,35 +65,55 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const verifyTextForSummary = async () => {
-    if (
-      !("translation" in self) ||
-      !("createDetector" in (self.translation as any))
-    ) {
+    const ai = (self as any).ai;
+    const languageDetectorCapabilities =
+      await ai.languageDetector.capabilities();
+    const canDetect = languageDetectorCapabilities.capabilities;
+    let detector;
+    if (canDetect === "no") {
       return;
     }
-    const detector = await (self.translation as any).createDetector();
-    const { detectedLanguage } = (await detector.detect(userInput.text))[0];
+    try {
+      detector = await ai.languageDetector.create();
+      if (canDetect === "after-download") {
+        detector.addEventListener("downloadprogress", (e: any) => {
+          console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
+        });
+        await detector.ready;
+      }
 
-    if (detectedLanguage === "en") {
-      setShowSummarizeButton(true);
-    } else {
-      setShowSummarizeButton(false);
+      const { detectedLanguage } = (await detector.detect(userInput.text))[0];
+      if (detectedLanguage === "en") {
+        setShowSummarizeButton(true);
+      } else {
+        setShowSummarizeButton(false);
+      }
+    } catch (error) {
+      console.error("ERROR: While verifying text for Summary", error);
     }
   };
 
   const handleDetection = async () => {
     setIsLoading(true);
+    const ai = (self as any).ai;
+    const languageDetectorCapabilities =
+      await ai.languageDetector.capabilities();
+    const canDetect = languageDetectorCapabilities.capabilities;
+    let detector;
+    if (canDetect === "no") {
+      toast.error("Your browsers doesn't support Detection API");
+      return;
+    }
     try {
-      if (
-        !("translation" in self) ||
-        !("createDetector" in (self.translation as any))
-      ) {
-        toast.error(
-          "Your browsers doesn't support Translation or Detection API"
-        );
-        return;
+      detector = await ai.languageDetector.create();
+
+      if (canDetect === "after-download") {
+        detector.addEventListener("downloadprogress", (e: any) => {
+          console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
+        });
+
+        await detector.ready;
       }
-      const detector = await (self.translation as any).createDetector();
 
       const { detectedLanguage, confidence } = (
         await detector.detect(userInput.text)
@@ -121,42 +141,52 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const handleTranslation = async () => {
     setIsLoading(true);
     const supportedLanguages = countryOptions.map((country) => country.code);
-    const translation = (self as any).translation;
+    const ai = (self as any).ai;
+    const translatorCapabilities = await ai.translator.capabilities();
+    const canTranslate = translatorCapabilities.capabilities;
+    let translator;
+
+    if (canTranslate === "no") {
+      toast.error("Your browser doesn't support the Translation API");
+      return;
+    }
 
     try {
-      if (
-        translation &&
-        "createTranslator" in translation &&
-        "createDetector" in translation
-      ) {
-        const detector = await translation.createDetector();
-        const detectionResults = await detector.detect(userInput.text);
-        const sourceLanguage = detectionResults[0]?.detectedLanguage;
+      const detector = await ai.languageDetector.create();
+      const detectionResults = await detector.detect(userInput.text);
+      const sourceLanguage = detectionResults[0]?.detectedLanguage;
 
-        if (!supportedLanguages.includes(sourceLanguage)) {
-          addToChats({
-            from: "Chucky",
-            text: `Currently, only English, Portuguese, French, Russian, Turkish and Spanish Translations are supported.`,
-          });
-          return;
-        }
-        const translator = await translation.createTranslator({
-          sourceLanguage,
-          targetLanguage: userInput.language,
-        });
-
-        const translateText = await translator.translate(userInput.text);
+      if (!supportedLanguages.includes(sourceLanguage)) {
         addToChats({
           from: "Chucky",
-          subject: `Translating ${languageTagToHumanReadable(
-            sourceLanguage,
-            "en"
-          )}  ↔ ${languageTagToHumanReadable(userInput.language, "en")}:`,
-          text: translateText,
+          text: "Currently, only English, Portuguese, French, Russian, Turkish, and Spanish translations are supported.",
         });
-      } else {
-        toast.error("Translation API is not supported in your browser.");
+        return;
       }
+
+      translator = await ai.translator.create({
+        sourceLanguage,
+        targetLanguage: userInput.language,
+      });
+
+      if (canTranslate === "after-download") {
+        translator.addEventListener("downloadprogress", (e: any) => {
+          console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
+        });
+
+        await translator.ready;
+      }
+
+      const translatedText = await translator.translate(userInput.text);
+
+      addToChats({
+        from: "Chucky",
+        subject: `Translating ${languageTagToHumanReadable(
+          sourceLanguage,
+          "en"
+        )} ↔ ${languageTagToHumanReadable(userInput.language, "en")}:`,
+        text: translatedText,
+      });
     } catch (error) {
       toast.error(
         "An error occurred while translating your text, please try again"
@@ -172,21 +202,27 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     const ai = (self as any).ai;
     const { available } = await ai.summarizer.capabilities();
     let summarizer;
+    console.log(available);
     if (available === "no") {
       toast.error("Summarize API is not supported in your browser.");
       return;
     }
     try {
-      summarizer = await ai.summarizer.create(summaryOptions);
+      summarizer = await ai.summarizer.create({
+        sharedContext: "This is a technical article",
+        type: "tl;dr",
+        format: "plain-text",
+        length: "short",
+      });
 
       if (available === "after-download") {
         summarizer.addEventListener("downloadprogress", (e: any) => {
           console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
         });
 
-        // console.log("Waiting for summarizer model to be ready...");
+        console.log("Waiting for summarizer model to be ready...");
         await summarizer.ready;
-        // console.log("Summarizer model is ready!");
+        console.log("Summarizer model is ready!");
       }
 
       const summary = await summarizer.summarize(userInput.text);
@@ -248,7 +284,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
     verifySummary();
-  }, [userInput.text]);
+  }, [userInput]);
 
   return (
     <AppContext.Provider

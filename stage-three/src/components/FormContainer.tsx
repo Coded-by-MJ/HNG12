@@ -34,7 +34,7 @@ function FormContainer() {
           disabled={isLoading}
           onChange={(e) => handleTextChange(e.target.value)}
           placeholder="Message Chucky"
-          className="w-full disabled:cursor-not-allowed text-start resize-none bg-transparent outline-0 border-0 text-gray-300 text-[0.9rem] text-wrap field-sizing-content min-h-[60px]"
+          className="w-full max-h-[200px]  scrollbar-thumb-gray-300 scrollbar-thin scrollbar-track-gray-600  scrollbar-thumb-rounded-full scrollbar-track-rounded-full overflow-y-auto disabled:cursor-not-allowed text-start resize-none bg-transparent outline-0 border-0 text-gray-300 text-[0.9rem] text-wrap field-sizing-content min-h-[60px]"
         ></textarea>
       </div>
       <div className="w-full justify-between items-center flex gap-3">

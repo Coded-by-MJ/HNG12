@@ -27,13 +27,6 @@ export const countryOptions: options[] = [
   },
 ];
 
-export const summaryOptions = {
-  sharedContext: "This is a technical article",
-  type: "tl;dr",
-  format: "plain-text",
-  length: "short",
-};
-
 export const languageTagToHumanReadable = (
   languageTag: string,
   targetLanguage: string
