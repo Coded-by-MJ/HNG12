@@ -198,7 +198,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     const ai = (self as any).ai;
     const { available } = await ai.summarizer.capabilities();
     let summarizer;
-    console.log(available);
+
     if (available === "no") {
       toast.error("Summarize API is not supported in your browser.");
       return;
@@ -216,9 +216,9 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
           console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
         });
 
-        console.log("Waiting for summarizer model to be ready...");
+        // console.log("Waiting for summarizer model to be ready...");
         await summarizer.ready;
-        console.log("Summarizer model is ready!");
+        // console.log("Summarizer model is ready!");
       }
 
       const summary = await summarizer.summarize(userInput.text);
