@@ -3,11 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { nanoid } from "nanoid";
 import { AppMode, ChatBox, LanguageCode } from "../utils/types";
 import { toast } from "react-toastify";
-import {
-  countryOptions,
-  languageTagToHumanReadable,
-  summaryOptions,
-} from "../utils/helper";
+import { countryOptions, languageTagToHumanReadable } from "../utils/helper";
 interface AppContextType {
   appMode: AppMode;
   userInput: { text: string; language: string };
